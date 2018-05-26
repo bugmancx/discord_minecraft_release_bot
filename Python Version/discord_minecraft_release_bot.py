@@ -5,7 +5,7 @@ import urllib.request, json, requests
 TMP = 'tmp'
 MANIFEST_VERSION_URL='https://launchermeta.mojang.com/mc/game/version_manifest.json'
 DISCORD_USERNAME='Minecraft'
-DISCORD_WEBHOOK_URL='https://canary.discordapp.com/api/webhooks/449739846387367958/o-dRZKgrS9ec3qaJ0MGDHUW2c4u3g6XziUvbSVhdNGNIommYMO_yAyB3KE5zBivZCvzT'
+DISCORD_WEBHOOK_URL=''
 
 # Setup Variables
 tmp_path = Path(TMP)
