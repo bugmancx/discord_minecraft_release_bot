@@ -17,6 +17,8 @@ _Bash version: Ensure the URL is wrapped around single quotes inside the variabl
 - You can modify the temporary location where the script should store its cache file in the TMP variable.
 
 # Requirements
+Bash Version:
+
 curl: https://curl.haxx.se/
 
 jq: https://stedolan.github.io/jq/
