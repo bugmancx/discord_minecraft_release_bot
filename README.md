@@ -6,7 +6,8 @@ The script will extract the "snapshot" and "release" version information from th
 
 # Installation Instructions
 1. Set up a Discord Webhook in your channel. See: https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks
-2. Add your webhook URL to the DISCORD_WEBHOOK_URL variable within the script. Ensure the URL is wrapped around single quotes inside the variable, or the curl command will not work. (An example is provided within the script.)
+2. Add your webhook URL to the DISCORD_WEBHOOK_URL variable within the script. 
+_Bash version: Ensure the URL is wrapped around single quotes inside the variable, or the curl command will not work. (An example is provided within the script.)_
 3. Add the script to cron to run at your convenience, but please use discretion and don't be excessive.
 
 
