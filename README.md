@@ -16,6 +16,8 @@ Optional:
 
 TMP: Path to your temporary files location.
 
+DISCORD_USERNAME: The username that the Bot will use in Discord when posting.
+
 MESSAGE_CONTENT: This is the text string posted to the Discord server. If you want anything more than the basic message you need to ensure that it's in the appropriate format to be included in the JSON payload. For example including \n for newlines.
 
 e.g.
@@ -34,10 +36,8 @@ e.g.
 RELEASE_VERB=__release__
 ```
 
-DISCORD_USERNAME: The username that the Bot will use in Discord when posting.
-
 # Installation Instructions
-1. Create a configuration file and include the three variables for ID, DISCORD_USERNAME and WEBHOOK_URL as per the example.
+1. Create a configuration file and include the three variables for ID and WEBHOOK_URL as per the example.
 2. Set up a Discord Webhook in your channel. See: https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks
 3. Add your webhook URL to the WEBHOOK_URL variable within the configuration file.
 4. Add the script to cron to run at your convenience, but please use discretion as each run will fetch the version manifest.
