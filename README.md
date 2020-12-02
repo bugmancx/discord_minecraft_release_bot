@@ -6,13 +6,15 @@ The script will extract the "snapshot" and "release" version information from th
 
 # Configuration File
 
-The source code includes an example configuration file specifying the three required configurable options.
+The source code includes an example configuration file specifying several options. Some are required for the bot to work and others are optional.
+
+**Required:**
 
 ID: The unique identifier for this bot instance. This is useful if running multiple instances of the bot for multiple discord servers.
 
 WEBHOOK_URL: The URL of the webhook used for posting to the Discord server.
 
-Optional:
+**Optional:**
 
 TMP: Path to your temporary files location.
 
@@ -42,7 +44,7 @@ RELEASE_VERB=__release__
 3. Add your webhook URL to the WEBHOOK_URL variable within the configuration file.
 4. Add the script to cron to run at your convenience, but please use discretion as each run will fetch the version manifest.
 
-Cron Example:
+**Cron Example:**
 
 ```
 */15 * * * *  ~/bots/discord_minecraft_release_bot.sh -c ~/bots/myinstance.conf
@@ -64,7 +66,7 @@ Upon first run, the script will download the version manifest and cache it. It w
 The easiest way to debug the script is to modify the cached Mojang manifest file directly in order to trigger the script to detect a change. Edit the file with your favourite editor and just modify the first release or snapshot value and change it to something else. Upon the next run, the script will detect a change in these values and post to Discord.
 
 # Requirements
-Bash Version:
+**Bash Version:**
 
 curl: https://curl.haxx.se/
 
