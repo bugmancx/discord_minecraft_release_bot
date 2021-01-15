@@ -89,15 +89,8 @@ CACHED_VERSION_SNAPSHOT=$(jq -r '.latest."snapshot"' $CACHED_FILE)
 
 
 function manifest_compare() {
-if [ ! "$CACHED_VERSION_RELEASE" == "$MANIFEST_VERSION_RELEASE" ] ; then
-  echo "Differences were detected in RELEASE"
-  DIFF=1
-  if [ ! -z ${RELEASE_VERB+x} ] ; then
-    VERB=$RELEASE_VERB
-  else
-    VERB="**release**"
-  fi
-fi
+## Always process snapshots before releases. That way when a release comes out, the snapshot tag will also be updated
+## but the posted message will indicate a new release.
 
 if [ ! "$CACHED_VERSION_SNAPSHOT" == "$MANIFEST_VERSION_SNAPSHOT" ] ; then
   echo "Differences were detected in SNAPSHOT"
@@ -108,6 +101,17 @@ if [ ! "$CACHED_VERSION_SNAPSHOT" == "$MANIFEST_VERSION_SNAPSHOT" ] ; then
     VERB="**snapshot**"
   fi
 fi
+
+if [ ! "$CACHED_VERSION_RELEASE" == "$MANIFEST_VERSION_RELEASE" ] ; then
+  echo "Differences were detected in RELEASE"
+  DIFF=1
+  if [ ! -z ${RELEASE_VERB+x} ] ; then
+    VERB=$RELEASE_VERB
+  else
+    VERB="**release**"
+  fi
+fi
+
 }
 
 if [ -z ${DISCORD_USERNAME+x} ]; 
