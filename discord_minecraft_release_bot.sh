@@ -1,6 +1,11 @@
 #!/bin/bash
 # Script written by bugmancx
 
+# Requirements:
+## jq
+## curl
+
+
 #Default Configurable Variables
 TMP=/tmp
 MANIFEST_VERSION_URL='https://launchermeta.mojang.com/mc/game/version_manifest.json'
@@ -49,7 +54,10 @@ validate_configuration() {
     ID=$SED_ID
   fi
 
-  if [ -z ${WEBHOOK_URL+x} ]; then echo "WEBHOOK_URL is not set."; SYNTAX=1 ; fi
+  if [ -z ${WEBHOOK_URL+x} ]; then
+    echo "WEBHOOK_URL is not set."
+    SYNTAX=1
+  fi
   
   if [ -n $SYNTAX ] ; then
     SYNTAX=0 # No issues found
@@ -65,17 +73,29 @@ validate_configuration() {
 ##################################################################
 
 ## CONSTRUCT VARIABLES
-CACHED_FILE="$TMP/$ID.cached_version_manifest.json"
+MANIFEST_CACHED_FILE="$TMP/$ID.cached_version_manifest.json"
 MANIFEST_FILE="$TMP/$ID.version_manifest.json"
 DIFF=0
 FIRST_RUN=0
+WEBHOOK_URL_POST=$WEBHOOK_URL # Set the webhook URL to post to - gets overridden later if others exist
 
 
 ## SET FUNCTIONS
 
 function get_manifest() {
-curl -s -o $MANIFEST_FILE $MANIFEST_VERSION_URL
-## Write this to disk; we'll use it twice and want to reduce calls against the Mojang API.
+curl -s -o $MANIFEST_FILE $MANIFEST_VERSION_URL # Fetch latest manifest
+
+if ! jq empty $MANIFEST_FILE; then
+  echo "JSON is invalid"
+  exit
+fi
+
+
+
+}
+
+function update_cache() {
+mv $MANIFEST_FILE $MANIFEST_CACHED_FILE
 }
 
 
@@ -83,22 +103,24 @@ function retrieve_and_set_values() {
 MANIFEST_VERSION_RELEASE=$(jq -r '.latest."release"' $MANIFEST_FILE)
 MANIFEST_VERSION_SNAPSHOT=$(jq -r '.latest."snapshot"' $MANIFEST_FILE)
 
-CACHED_VERSION_RELEASE=$(jq -r '.latest."release"' $CACHED_FILE)
-CACHED_VERSION_SNAPSHOT=$(jq -r '.latest."snapshot"' $CACHED_FILE)
+CACHED_VERSION_RELEASE=$(jq -r '.latest."release"' $MANIFEST_CACHED_FILE)
+CACHED_VERSION_SNAPSHOT=$(jq -r '.latest."snapshot"' $MANIFEST_CACHED_FILE)
+
 }
 
 
 function manifest_compare() {
-## Always process snapshots before releases. That way when a release comes out, the snapshot tag will also be updated
-## but the posted message will indicate a new release.
-
 if [ ! "$CACHED_VERSION_SNAPSHOT" == "$MANIFEST_VERSION_SNAPSHOT" ] ; then
   echo "Differences were detected in SNAPSHOT"
   DIFF=1
-  if [ ! -z ${SNAPSHOT_VERB+x} ] ; then
+  if [ ! -z ${SNAPSHOT_VERB+x} ] ; then # Check if a verb is defined
     VERB=$SNAPSHOT_VERB
   else
     VERB="**snapshot**"
+  fi
+
+  if [ ! -z ${SNAPSHOT_WEBHOOK_URL+x} ] ; then # Check if a snapshot webhook URL exists
+    WEBHOOK_URL_POST=$SNAPSHOT_WEBHOOK_URL
   fi
 fi
 
@@ -109,6 +131,9 @@ if [ ! "$CACHED_VERSION_RELEASE" == "$MANIFEST_VERSION_RELEASE" ] ; then
     VERB=$RELEASE_VERB
   else
     VERB="**release**"
+  fi
+  if [ ! -z ${RELEASE_WEBHOOK_URL+x} ] ; then # Check if a snapshot webhook URL exists
+    WEBHOOK_URL_POST=$RELEASE_WEBHOOK_URL
   fi
 fi
 
@@ -121,11 +146,7 @@ fi
 function discord_post () {
 curl -H "Content-Type: application/json" \
  -X POST \
- -d "{\"username\": \"$DISCORD_USERNAME\", \"content\": \"$MESSAGE_CONTENT\"}" {$WEBHOOK_URL}
-}
-
-function update_cache() {
-  mv $MANIFEST_FILE $CACHED_FILE
+ -d "{\"username\": \"$DISCORD_USERNAME\", \"content\": \"$MESSAGE_CONTENT\"}" {$WEBHOOK_URL_POST}
 }
 
 ##############################################################################
@@ -138,7 +159,7 @@ get_manifest
 retrieve_and_set_values
 
 # Retrieve latest version from Mojang manifest
-if [ ! -f $CACHED_FILE ] ; then
+if [ ! -f $MANIFEST_CACHED_FILE ] ; then
   echo "WARNING: No cached manifest exists. This may be our first run."
   echo "No results will be posted until the next manifest update from Mojang."
   FIRST_RUN=1
@@ -155,7 +176,6 @@ manifest_compare
 # If differences detected, do Discord
 if [ $DIFF -gt 0 ] ; then
   if [ -z ${MESSAGE_CONTENT+x} ] ; then # If not already set in config file
-    echo "MC=$MESSAGE_CONTENT"
     # Specify the default wording for the bot's custom message.
     MESSAGE_CONTENT="A new Minecraft $VERB is available! | Release: $MANIFEST_VERSION_RELEASE | Snapshot: $MANIFEST_VERSION_SNAPSHOT"
   else
