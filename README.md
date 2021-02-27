@@ -41,7 +41,7 @@ RELEASE_VERB=__release__
 # Installation Instructions
 1. Create a configuration file and include the three variables for ID and WEBHOOK_URL as per the example.
 2. Set up a Discord Webhook in your channel. See: https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks
-3. Add your webhook URL to the WEBHOOK_URL variable within the configuration file.
+3. Add your webhook URL to the WEBHOOK_URL variable within the configuration file. Note, if you are using separate channels for release and snapshots, you can define these instead as SNAPSHOT_WEBHOOK_URL and RELEASE_WEBHOOK_URL respectively.
 4. Add the script to cron to run at your convenience, but please use discretion as each run will fetch the version manifest.
 
 **Cron Example:**
