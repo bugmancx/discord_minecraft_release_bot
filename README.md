@@ -74,4 +74,4 @@ jq: https://stedolan.github.io/jq/
 
 # Contributors
 
-Python variation contributed by TheUnlocked based on first version of the script. May be out of date and is unmaintained.
+In an earlier version, a Python variation of this script was created and contributed by TheUnlocked. As it is unmaintained and does not follow the latest version changes, it has been removed from this repository but can be found at https://github.com/TheUnlocked/discord_minecraft_release_bot if there is still an interest in it.
